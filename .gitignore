@@ -1,0 +1,43 @@
+# Binaries and Object Files
+*.exe
+*.obj
+*.o
+*.a
+*.lib
+*.dll
+*.so
+*.dylib
+
+# Build directories
+build/
+bin/
+out/
+dist/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Visual Studio / MSVC
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.idb
+*.pdb
+*.ilk
+*.exp
+*.VC.db
+*.opendb
+
+# VS Code & JetBrains IDEs
+.vscode/
+.idea/
+*.swp
+*~
+
+# Windows OS generated files
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
