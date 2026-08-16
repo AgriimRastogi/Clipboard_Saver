@@ -23,7 +23,7 @@ if %ERRORLEVEL% equ 0 (
 where g++ >nul 2>&1
 if %ERRORLEVEL% equ 0 (
     echo [*] Found g++ (MinGW). Compiling standalone binary...
-    g++ -std=c++17 -O3 -mwindows main.cpp -lgdiplus -lole32 -lshell32 -luser32 -o ClipboardSaver.exe
+    g++ -std=c++17 -O3 -mwindows main.cpp -lgdiplus -lole32 -lshell32 -luser32 -luuid -o ClipboardSaver.exe
     if %ERRORLEVEL% equ 0 (
         echo [OK] Build succeeded. Created ClipboardSaver.exe
         goto done

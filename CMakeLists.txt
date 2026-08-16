@@ -13,7 +13,7 @@ if (MSVC)
     target_link_libraries(ClipboardSaver PRIVATE gdiplus ole32 shell32 user32)
     target_compile_options(ClipboardSaver PRIVATE /W4 /O2 /EHsc)
 else()
-    target_link_libraries(ClipboardSaver PRIVATE -lgdiplus -lole32 -lshell32 -luser32)
+    target_link_libraries(ClipboardSaver PRIVATE -lgdiplus -lole32 -lshell32 -luser32 -luuid)
     target_compile_options(ClipboardSaver PRIVATE -Wall -Wextra -O3)
 endif()
 

@@ -25,7 +25,7 @@ if ($cmake) {
 $gpp = Get-Command g++ -ErrorAction SilentlyContinue
 if ($gpp) {
     Write-Host "[*] Found g++ (MinGW). Compiling standalone binary..." -ForegroundColor Yellow
-    & g++ -std=c++17 -O3 -mwindows main.cpp -lgdiplus -lole32 -lshell32 -luser32 -o ClipboardSaver.exe
+    & g++ -std=c++17 -O3 -mwindows main.cpp -lgdiplus -lole32 -lshell32 -luser32 -luuid -o ClipboardSaver.exe
     if ($LASTEXITCODE -eq 0) {
         Write-Host "[OK] Build succeeded! Created ClipboardSaver.exe" -ForegroundColor Green
         exit 0

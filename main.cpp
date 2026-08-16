@@ -1,4 +1,7 @@
 #include <windows.h>
+#include <initguid.h>
+#include <knownfolders.h>
+#include <shlobj.h>
 #include <objbase.h>
 #include <gdiplus.h>
 #include <iostream>
@@ -9,13 +12,7 @@
 #include <vector>
 #include <memory>
 
-// ============================================================================
-// CONFIGURATION
-// Default target folder path for saved clipboard images when no argument is passed.
-// Environment variables such as %USERPROFILE% or %ONEDRIVE% are automatically expanded.
-// Example: L"%USERPROFILE%\\Pictures\\Clipboard" or L"D:\\Screenshots"
-// ============================================================================
-const wchar_t* DEFAULT_SAVE_DIRECTORY = L"%USERPROFILE%\\Pictures\\Clipboard";
+
 
 // ============================================================================
 // RAII GUARDS
@@ -91,6 +88,21 @@ std::wstring ExpandEnvironmentPath(const wchar_t* inputPath) {
 
     // Create std::wstring from null-terminated buffer
     return std::wstring(buffer.data());
+}
+
+// Resolves the official Windows Pictures\Clipboard directory.
+// Automatically accounts for OneDrive redirection, custom user folders, or standard local paths.
+std::filesystem::path GetDefaultSaveDirectory() {
+    PWSTR pKnownPath = nullptr;
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Pictures, 0, nullptr, &pKnownPath))) {
+        std::filesystem::path picturesDir(pKnownPath);
+        CoTaskMemFree(pKnownPath);
+        return picturesDir / L"Clipboard";
+    }
+
+    // Fallback if Windows Known Folders lookup fails
+    std::wstring fallbackPath = ExpandEnvironmentPath(L"%USERPROFILE%\\Pictures\\Clipboard");
+    return std::filesystem::path(fallbackPath);
 }
 
 // Retrieves the CLSID for a GDI+ image encoder given a MIME type (e.g. L"image/png")
@@ -199,23 +211,28 @@ int main() {
         return 0; // Exit silently if PNG encoder is unavailable
     }
 
-    // 7. Resolve output directory (from CLI argument if provided, or default)
-    std::wstring targetConfigPath = DEFAULT_SAVE_DIRECTORY;
+    // 7. Resolve output directory (custom CLI argument if provided, or official Pictures\Clipboard)
+    std::filesystem::path outputDir;
     int numArgs = 0;
     LPWSTR* argList = CommandLineToArgvW(GetCommandLineW(), &numArgs);
     if (argList != nullptr) {
         if (numArgs > 1 && wcslen(argList[1]) > 0) {
-            targetConfigPath = argList[1];
+            std::wstring expandedCustom = ExpandEnvironmentPath(argList[1]);
+            if (!expandedCustom.empty()) {
+                outputDir = std::filesystem::path(expandedCustom);
+            }
         }
         LocalFree(argList);
     }
 
-    std::wstring expandedDirStr = ExpandEnvironmentPath(targetConfigPath.c_str());
-    if (expandedDirStr.empty()) {
+    if (outputDir.empty()) {
+        outputDir = GetDefaultSaveDirectory();
+    }
+
+    if (outputDir.empty()) {
         return 0;
     }
 
-    std::filesystem::path outputDir(expandedDirStr);
     std::error_code ec;
     if (!std::filesystem::exists(outputDir, ec)) {
         if (!std::filesystem::create_directories(outputDir, ec)) {
