@@ -173,9 +173,9 @@ std::filesystem::path GetUniqueFilePath(const std::filesystem::path& dirPath, co
 }
 
 // ============================================================================
-// MAIN ENTRY POINT
+// MAIN ENTRY POINT (Windows GUI Subsystem)
 // ============================================================================
-int main() {
+int WINAPI WinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int /*nCmdShow*/) {
     // 1. Initialize GDI+ using RAII guard
     GdiplusGuard gdiplus;
     if (!gdiplus.isInitialized()) {
